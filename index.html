@@ -1,0 +1,1860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Archive</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Literata:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fafaf8;
+      --surface: #ffffff;
+      --text: #1a1a1a;
+      --text-secondary: #6b6b6b;
+      --border: #e5e5e5;
+      --accent: #2c2c2c;
+      --hover: #f5f5f5;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      text-align: left;
+    }
+
+    body {
+      font-family: 'IBM Plex Mono', monospace;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding-bottom: 100px;
+      text-align: left;
+      touch-action: pan-x pan-y;
+    }
+
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 24px;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+      background: rgba(250, 250, 248, 0.95);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .header-left {
+      flex: 1;
+    }
+
+    .header h1 {
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .profile-btn {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      cursor: pointer;
+      padding: 4px 12px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      background: var(--surface);
+      transition: all 0.2s ease;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    .profile-btn:hover {
+      background: var(--hover);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .breadcrumb-item {
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .breadcrumb-item:hover {
+      color: var(--accent);
+    }
+
+    .breadcrumb-separator {
+      color: var(--border);
+    }
+
+    .add-button {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s ease;
+      z-index: 99;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .add-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-content {
+      background: var(--surface);
+      border-radius: 2px;
+      max-width: 480px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s ease;
+      text-align: left;
+    }
+
+    .modal-content input[type="text"],
+    .modal-content input[type="email"],
+    .modal-content input[type="password"],
+    .modal-content input[type="url"],
+    .modal-content textarea {
+      text-align: left !important;
+    }
+
+    .modal-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-header h2 {
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+    }
+
+    .modal-body {
+      padding: 24px;
+      text-align: left;
+    }
+
+    .type-selector {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .type-btn {
+      padding: 12px;
+      background: var(--hover);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .type-btn:hover {
+      background: var(--surface);
+      border-color: var(--accent);
+    }
+
+    .type-btn.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      background: var(--surface);
+      transition: border-color 0.2s ease;
+      text-align: left;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+      text-align: left !important;
+      vertical-align: top;
+      direction: ltr !important;
+      unicode-bidi: normal;
+      text-indent: 0 !important;
+      word-spacing: normal !important;
+      letter-spacing: normal !important;
+      text-transform: none !important;
+    }
+
+    #notesInput {
+      text-align: start !important;
+      text-align: -webkit-left !important;
+      text-align: -moz-left !important;
+      text-align: left !important;
+      direction: ltr !important;
+      writing-mode: horizontal-tb !important;
+      -webkit-text-align: left !important;
+      -moz-text-align: left !important;
+      text-indent: 0 !important;
+      padding-left: 12px !important;
+      word-spacing: normal !important;
+      letter-spacing: normal !important;
+    }
+
+    #notesInput::placeholder {
+      text-align: left !important;
+    }
+
+    #itemForm {
+      text-align: left !important;
+    }
+
+    #itemForm input[type="text"],
+    #itemForm input[type="email"],
+    #itemForm input[type="password"],
+    #itemForm input[type="url"],
+    #itemForm textarea {
+      text-align: left !important;
+    }
+
+    #profileForm {
+      text-align: left !important;
+    }
+
+    #profileForm input[type="text"],
+    #profileForm input[type="email"],
+    #profileForm input[type="password"],
+    #profileForm input[type="url"],
+    #profileForm textarea {
+      text-align: left !important;
+    }
+
+    /* Absolute final override for all textareas */
+    textarea,
+    textarea:focus,
+    textarea:active,
+    textarea:hover {
+      text-align: left !important;
+      text-align: -webkit-left !important;
+      text-align: -moz-left !important;
+    }
+
+    .file-input-wrapper {
+      position: relative;
+      border: 2px dashed var(--border);
+      border-radius: 2px;
+      padding: 32px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .file-input-wrapper:hover {
+      border-color: var(--accent);
+      background: var(--hover);
+    }
+
+    .file-input-wrapper input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .preview {
+      margin-top: 16px;
+      max-width: 100%;
+    }
+
+    .preview img, .preview video {
+      max-width: 100%;
+      border-radius: 2px;
+    }
+
+    .modal-footer {
+      padding: 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    button {
+      padding: 12px 24px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--surface);
+    }
+
+    button:hover {
+      background: var(--hover);
+    }
+
+    button.primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    button.primary:hover {
+      background: #1a1a1a;
+    }
+
+    .items-container {
+      padding: 24px;
+      padding-top: 110px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .items-container.folder-view {
+      display: block;
+      padding: 32px 0 32px 24px;
+      padding-top: 110px;
+      overflow: hidden;
+    }
+
+    .carousel {
+      display: flex;
+      overflow-x: auto;
+      overflow-y: visible;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 20px 24px 20px 0;
+      gap: 0;
+      cursor: grab;
+      user-select: none;
+    }
+
+    .carousel::-webkit-scrollbar {
+      display: none;
+    }
+
+    .carousel:active {
+      cursor: grabbing;
+    }
+
+    .carousel-item {
+      flex: 0 0 78vw;
+      max-width: 320px;
+      scroll-snap-align: start;
+      margin-left: -24px;
+      position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, z-index 0s;
+      z-index: 1;
+    }
+
+    .carousel-item:first-child {
+      margin-left: 0;
+    }
+
+    .carousel-item:hover {
+      transform: translateY(-4px) scale(1.01);
+      z-index: 2;
+    }
+
+    .carousel-item.active {
+      z-index: 10;
+      transform: translateY(-4px) scale(1.02);
+    }
+
+    .carousel-item.active .item {
+      box-shadow: 6px 8px 24px rgba(0,0,0,0.18);
+    }
+
+    .carousel-item .item {
+      animation: none;
+      border-radius: 8px;
+      box-shadow: 2px 4px 16px rgba(0,0,0,0.10);
+      height: 100%;
+      min-height: 180px;
+    }
+
+    .carousel-hint {
+      font-size: 11px;
+      color: var(--text-secondary);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 0 0 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .carousel-hint::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      margin-right: 24px;
+    }
+
+    .type-section {
+      margin-bottom: 32px;
+    }
+
+    .type-section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      padding: 0 0 12px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .type-section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      margin-right: 24px;
+    }
+
+    .item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      transition: all 0.2s ease;
+      animation: fadeInUp 0.4s ease;
+    }
+
+    .item:hover {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .item.clickable {
+      cursor: pointer;
+    }
+
+    .item.clickable:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .folder-icon {
+      width: 100%;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--hover);
+      font-size: 18px;
+      font-weight: 500;
+      font-family: 'Literata', serif;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+      padding: 0 16px;
+    }
+
+    .folder-icon:hover {
+      background: #efefef;
+    }
+
+    .collections-heading {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-secondary);
+      padding: 0 0 8px 0;
+    }
+
+    .item-media {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      background: var(--hover);
+      cursor: pointer;
+      transition: opacity 0.2s ease;
+    }
+
+    .item-media:hover {
+      opacity: 0.9;
+    }
+
+    .detail-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      animation: fadeIn 0.2s ease;
+      overflow-y: auto;
+      padding: 24px;
+    }
+
+    .detail-modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .detail-content {
+      background: var(--surface);
+      border-radius: 2px;
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s ease;
+      text-align: left !important;
+      text-align: -webkit-left !important;
+      text-align: -moz-left !important;
+    }
+
+    .detail-content div,
+    .detail-content p,
+    .detail-content span,
+    .detail-content label {
+      text-align: left;
+    }
+
+    .detail-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      position: relative;
+    }
+
+    .detail-header h2 {
+      position: absolute;
+      left: 20px;
+      right: 56px;
+      font-size: 16px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .detail-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .detail-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 500;
+      color: #e53e3e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .icon-btn:hover {
+      background: #fee;
+      border-color: #e53e3e;
+    }
+
+    .detail-body {
+      padding: 24px;
+      text-align: left !important;
+      text-align: -webkit-left !important;
+      text-align: -moz-left !important;
+      direction: ltr !important;
+    }
+
+    .detail-body div,
+    .detail-body p,
+    .detail-body span,
+    .detail-body label {
+      text-align: left !important;
+      text-align: -webkit-left !important;
+      text-align: -moz-left !important;
+      direction: ltr !important;
+    }
+
+    /* Specific rule for notes display in detail view */
+    .detail-body .form-group div {
+      text-align: left !important;
+      text-align: -webkit-left !important;
+      text-align: -moz-left !important;
+      direction: ltr !important;
+      text-indent: 0 !important;
+      margin: 0 !important;
+      padding-left: 12px !important;
+    }
+
+    .detail-media {
+      width: 100%;
+      max-height: 60vh;
+      object-fit: contain;
+      background: var(--hover);
+      border-radius: 2px;
+    }
+
+    .detail-form .form-group {
+      margin-bottom: 20px;
+    }
+
+
+    .item-link {
+      padding: 16px;
+      background: var(--hover);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .item-link a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 12px;
+      word-break: break-all;
+    }
+
+    .item-link a:hover {
+      text-decoration: underline;
+    }
+
+    .item-content {
+      padding: 16px;
+    }
+
+    .item-title {
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      font-family: 'Literata', serif;
+    }
+
+    .item-description {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      text-align: left !important;
+    }
+
+    .item-meta {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 10px 12px;
+      border-top: 1px solid var(--border);
+      gap: 8px;
+    }
+
+    .item-type {
+      display: none;
+    }
+
+    .btn-delete {
+      padding: 6px 14px;
+      font-size: 11px;
+      font-family: 'IBM Plex Mono', monospace;
+      background: #e53e3e;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      letter-spacing: 0.03em;
+    }
+
+    .btn-delete:hover {
+      background: #c53030;
+    }
+
+    .btn-edit {
+      padding: 6px 14px;
+      font-size: 11px;
+      font-family: 'IBM Plex Mono', monospace;
+      background: #3182ce;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      letter-spacing: 0.03em;
+    }
+
+    .btn-edit:hover {
+      background: #2b6cb0;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 80px 24px;
+      color: var(--text-secondary);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { 
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to { 
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .type-selector {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+  <style>
+    /* Nuclear option - maximum specificity override for textarea alignment */
+    textarea[data-align="left"],
+    textarea[data-align="left"]:focus,
+    textarea[data-align="left"]:active,
+    html body div.modal.active div.modal-content div.modal-body form#itemForm div.form-group textarea#notesInput,
+    textarea#notesInput,
+    #notesInput,
+    #notesInput:focus,
+    #notesInput:active,
+    #notesInput:hover,
+    #notesInput:focus-visible,
+    #notesInput::before,
+    #notesInput::after {
+      text-align: left !important;
+      text-align: -webkit-left !important;
+      text-align: -moz-left !important;
+      direction: ltr !important;
+      text-indent: 0 !important;
+      padding-left: 12px !important;
+      margin-left: 0 !important;
+      text-align-last: left !important;
+    }
+    
+    /* Override any potential centering from parent containers */
+    form#itemForm,
+    div.modal-body,
+    div.form-group {
+      text-align: left !important;
+      display: block !important;
+    }
+
+    /* Force left alignment in detail view */
+    .detail-body,
+    .detail-body div,
+    .detail-body .form-group,
+    .detail-body .form-group div,
+    .detail-content,
+    .detail-content div,
+    .detail-content p,
+    .detail-content span {
+      text-align: left !important;
+      direction: ltr !important;
+    }
+
+    /* Ultra-specific rule for notes display in detail modal */
+    .detail-notes-display,
+    div.detail-notes-display,
+    .detail-body .detail-notes-display,
+    .detail-body .form-group .detail-notes-display {
+      text-align: left !important;
+      text-align: -webkit-left !important;
+      text-align: -moz-left !important;
+      direction: ltr !important;
+      text-indent: 0 !important;
+      margin: 0 !important;
+      display: block !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-left">
+      <h1>Archive</h1>
+      <div class="breadcrumb" id="breadcrumb"></div>
+    </div>
+    <button class="profile-btn" onclick="openProfileModal()">Profile</button>
+  </div>
+
+  <div class="items-container" id="itemsContainer">
+    <div class="empty-state">
+      <div class="empty-state-icon">□</div>
+      <p>No items yet. Tap + to add.</p>
+    </div>
+  </div>
+
+  <button class="add-button" onclick="openModal()">+</button>
+
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modalTitle">Add Item</h2>
+      </div>
+      <div class="modal-body">
+        <div class="type-selector" id="typeSelector">
+          <button class="type-btn active" onclick="selectType('image')" data-type="image" id="imageBtn">Image</button>
+          <button class="type-btn" onclick="selectType('link')" data-type="link" id="linkBtn">Link</button>
+          <button class="type-btn" onclick="selectType('note')" data-type="note" id="noteBtn">Note</button>
+          <button class="type-btn" onclick="selectType('folder')" data-type="folder" id="folderBtn">Collection</button>
+        </div>
+
+        <form id="itemForm">
+          <div class="form-group" id="fileGroup">
+            <label>Upload</label>
+            <div class="file-input-wrapper">
+              <input type="file" id="fileInput" accept="image/*">
+              <div>Tap to select file</div>
+            </div>
+            <div id="preview" class="preview"></div>
+          </div>
+
+          <div class="form-group" id="linkGroup" style="display: none;">
+            <label>URL</label>
+            <input type="url" id="linkInput" placeholder="https://example.com">
+          </div>
+
+          <div class="form-group" id="titleGroup">
+            <label id="titleLabel">Title (optional)</label>
+            <input type="text" id="titleInput" placeholder="Enter a title">
+          </div>
+
+          <div class="form-group" id="notesGroup">
+            <label>Notes (optional)</label>
+            <textarea id="notesInput" data-align="left" placeholder="Add your notes here" dir="ltr" style="text-align: left !important; direction: ltr !important; text-indent: 0 !important;"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeModal()">Cancel</button>
+        <button class="primary" onclick="saveItem()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="detail-modal" id="detailModal">
+    <div class="detail-content">
+      <div class="detail-header">
+        <h2 id="detailTitle">Item Details</h2>
+        <button class="icon-btn" onclick="closeDetail()" title="Close">✕</button>
+      </div>
+      <div class="detail-body" id="detailBody">
+        <!-- Content will be dynamically inserted -->
+      </div>
+      <div class="detail-footer">
+        <button class="btn-edit" onclick="editDetail()">Edit</button>
+        <button class="btn-delete" onclick="deleteFromDetail()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="profileModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Profile</h2>
+      </div>
+      <div class="modal-body">
+        <form id="profileForm">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="profileEmail" placeholder="your@email.com" required>
+          </div>
+
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="profilePassword" placeholder="Create a password" required>
+          </div>
+
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" id="profilePasswordConfirm" placeholder="Confirm password" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeProfileModal()">Cancel</button>
+        <button class="primary" onclick="saveProfile()">Save Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentType = 'image';
+    let currentFile = null;
+    let items = [];
+    let currentDetailItem = null;
+    let isEditMode = false;
+    let currentFolder = null;
+    let folderPath = [];
+
+    // Load items from storage on startup
+    function loadItems() {
+      try {
+        const stored = localStorage.getItem('archiveItems');
+        if (stored) {
+          items = JSON.parse(stored);
+          items.sort((a, b) => b.timestamp - a.timestamp);
+        }
+        renderItems();
+      } catch (error) {
+        console.log('No items found yet');
+      }
+    }
+
+    function saveToStorage() {
+      try {
+        localStorage.setItem('archiveItems', JSON.stringify(items));
+      } catch (error) {
+        if (error.name === 'QuotaExceededError') {
+          throw new Error('Storage full. Try deleting some items or use smaller images.');
+        }
+        console.error('Failed to save to storage:', error);
+        throw error;
+      }
+    }
+
+    function selectType(type) {
+      currentType = type;
+      document.querySelectorAll('.type-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      
+      // Only add active class if there's an event (button clicked)
+      if (typeof event !== 'undefined' && event.target) {
+        event.target.classList.add('active');
+      }
+
+      const fileGroup = document.getElementById('fileGroup');
+      const linkGroup = document.getElementById('linkGroup');
+      const notesGroup = document.getElementById('notesGroup');
+      const titleLabel = document.getElementById('titleLabel');
+      const fileInput = document.getElementById('fileInput');
+
+      if (type === 'link' || type === 'note' || type === 'folder') {
+        fileGroup.style.display = 'none';
+        linkGroup.style.display = type === 'link' ? 'block' : 'none';
+      } else {
+        fileGroup.style.display = 'block';
+        linkGroup.style.display = 'none';
+        fileInput.accept = 'image/*';
+      }
+
+      // Hide notes field for collections
+      notesGroup.style.display = type === 'folder' ? 'none' : 'block';
+      
+      // Update title label for collections
+      if (type === 'folder') {
+        titleLabel.textContent = 'Name';
+      } else {
+        titleLabel.textContent = 'Title (optional)';
+      }
+
+      document.getElementById('preview').innerHTML = '';
+      currentFile = null;
+    }
+
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        currentFile = file;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const preview = document.getElementById('preview');
+          preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function openModal() {
+      document.getElementById('modal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+      
+      // Get all type buttons
+      const imageBtn = document.getElementById('imageBtn');
+      const linkBtn = document.getElementById('linkBtn');
+      const noteBtn = document.getElementById('noteBtn');
+      const folderBtn = document.getElementById('folderBtn');
+      const typeSelector = document.getElementById('typeSelector');
+      const modalTitle = document.getElementById('modalTitle');
+      
+      if (currentFolder) {
+        // Inside a folder: show Image, Link, Note - hide Collection
+        imageBtn.style.display = 'block';
+        linkBtn.style.display = 'block';
+        noteBtn.style.display = 'block';
+        folderBtn.style.display = 'none';
+        typeSelector.style.display = 'grid';
+        modalTitle.textContent = 'Add Item';
+        
+        // If folder was selected, switch to image
+        if (currentType === 'folder') {
+          selectType('image');
+          imageBtn.classList.add('active');
+        }
+      } else {
+        // At home: hide type selector, show only Collection
+        imageBtn.style.display = 'none';
+        linkBtn.style.display = 'none';
+        noteBtn.style.display = 'none';
+        folderBtn.style.display = 'block';
+        typeSelector.style.display = 'none';
+        modalTitle.textContent = 'New Collection';
+        
+        // Auto-select collection type at home
+        selectType('folder');
+        folderBtn.classList.add('active');
+        
+        // Explicitly hide file upload, link, and notes fields for collections
+        document.getElementById('fileGroup').style.display = 'none';
+        document.getElementById('linkGroup').style.display = 'none';
+        document.getElementById('notesGroup').style.display = 'none';
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('active');
+      document.body.style.overflow = '';
+      resetForm();
+    }
+
+    function resetForm() {
+      document.getElementById('itemForm').reset();
+      document.getElementById('preview').innerHTML = '';
+      currentFile = null;
+      selectType('image');
+      document.querySelector('[data-type="image"]').classList.add('active');
+      
+      // Reset modal title and show type selector
+      document.getElementById('modalTitle').textContent = 'Add Item';
+      document.getElementById('typeSelector').style.display = 'grid';
+      
+      // Reset all type buttons to visible (openModal will hide as needed)
+      document.getElementById('imageBtn').style.display = 'block';
+      document.getElementById('linkBtn').style.display = 'block';
+      document.getElementById('noteBtn').style.display = 'block';
+      document.getElementById('folderBtn').style.display = 'block';
+      
+      // Reset title label and notes visibility
+      document.getElementById('titleLabel').textContent = 'Title (optional)';
+      document.getElementById('notesGroup').style.display = 'block';
+      
+      // Reset modal footer
+      const modalFooter = document.querySelector('.modal-footer');
+      modalFooter.innerHTML = `
+        <button onclick="closeModal()">Cancel</button>
+        <button class="primary" onclick="saveItem()">Save</button>
+      `;
+      
+      isEditMode = false;
+    }
+
+    async function saveItem() {
+      const title = document.getElementById('titleInput').value;
+      const notes = document.getElementById('notesInput').value;
+      const link = document.getElementById('linkInput').value;
+
+      // Validation: check if there's content to save
+      if (currentType === 'note' && !notes && !title) {
+        alert('Please add a title or notes to save.');
+        return;
+      }
+      if (currentType === 'link' && !link) {
+        alert('Please add a URL to save.');
+        return;
+      }
+      if (currentType === 'folder' && !title) {
+        alert('Please add a collection name.');
+        return;
+      }
+      if (currentType === 'image' && !currentFile) {
+        alert('Please select a file to upload.');
+        return;
+      }
+
+      // Show loading state
+      const saveBtn = document.querySelector('.modal-footer .primary');
+      if (!saveBtn) return;
+      
+      saveBtn.textContent = 'Saving...';
+      saveBtn.disabled = true;
+
+      // Process save in next tick
+      setTimeout(async () => {
+        let success = false;
+        let errorMsg = '';
+        
+        try {
+          let mediaData = null;
+          
+          // Only read file if we have one
+          if (currentFile) {
+            try {
+              mediaData = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = () => reject(new Error('Could not read file'));
+                reader.readAsDataURL(currentFile);
+              });
+            } catch (fileError) {
+              errorMsg = 'Failed to read file';
+              throw fileError;
+            }
+          }
+
+          // Create item
+          const item = {
+            id: Date.now().toString(),
+            type: currentType,
+            title: title || (currentType === 'note' ? 'Note' : currentType === 'folder' ? 'Folder' : currentType === 'link' ? 'Link' : ''),
+            notes: notes,
+            link: link,
+            media: mediaData,
+            parentFolder: currentFolder,
+            timestamp: Date.now()
+          };
+
+          // Save to storage
+          try {
+            items.unshift(item);
+            saveToStorage();
+            success = true;
+          } catch (storageError) {
+            errorMsg = storageError.message;
+            throw storageError;
+          }
+
+        } catch (error) {
+          // Only show alert if we actually failed
+          if (!success) {
+            const msg = errorMsg || error.message || 'Unknown error';
+            alert('Failed to save: ' + msg);
+            saveBtn.textContent = 'Save';
+            saveBtn.disabled = false;
+          }
+          return;
+        }
+
+        // Success path
+        if (success) {
+          renderItems();
+          saveBtn.textContent = 'Save';
+          saveBtn.disabled = false;
+          closeModal();
+        }
+      }, 50);
+    }
+
+    function deleteItem(id) {
+      if (confirm('Delete this item?')) {
+        try {
+          items = items.filter(item => item.id !== id);
+          saveToStorage();
+          renderItems();
+        } catch (error) {
+          alert('Failed to delete item. Please try again.');
+          console.error(error);
+        }
+      }
+    }
+
+    function renderItems() {
+      const container = document.getElementById('itemsContainer');
+      
+      // Filter items by current folder
+      const displayItems = items.filter(item => item.parentFolder === currentFolder);
+      
+      // Update breadcrumb
+      updateBreadcrumb();
+
+      // Toggle folder view class
+      if (currentFolder) {
+        container.classList.add('folder-view');
+      } else {
+        container.classList.remove('folder-view');
+      }
+      
+      if (displayItems.length === 0) {
+        const emptyMessage = currentFolder 
+          ? 'No items yet. Tap + to add.' 
+          : 'Create a collection to get started.';
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">□</div>
+            <p>${emptyMessage}</p>
+          </div>
+        `;
+        return;
+      }
+
+      const buildItemHTML = (item) => {
+        const date = new Date(item.timestamp).toLocaleDateString('en-US', { 
+          month: 'short', 
+          day: 'numeric', 
+          year: 'numeric' 
+        });
+
+        let mediaHTML = '';
+        if (item.type === 'image' && item.media) {
+          mediaHTML = `<img src="${item.media}" alt="${item.title}" class="item-media" onclick="openDetail('${item.id}')">`;
+        }
+
+        let linkHTML = '';
+        if (item.type === 'link' && item.link) {
+          linkHTML = `
+            <div class="item-link">
+              <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.link}</a>
+            </div>
+          `;
+        }
+
+        const itemClass = item.type === 'note' ? 'item clickable' : 'item';
+        const clickHandler = item.type === 'note' ? `onclick="openDetail('${item.id}')"` : '';
+        const showTitle = item.type !== 'image';
+
+        return `
+          <div class="${itemClass}" ${clickHandler}>
+            ${mediaHTML}
+            ${showTitle ? `
+            <div class="item-content">
+              <div class="item-title">${item.title}</div>
+              ${item.notes ? `<div class="item-description">${item.notes}</div>` : ''}
+            </div>` : ''}
+            ${linkHTML}
+            <div class="item-meta">
+              <button class="btn-edit" onclick="event.stopPropagation(); editDetailById('${item.id}')">Edit</button>
+              <button class="btn-delete" onclick="event.stopPropagation(); deleteItem('${item.id}')">Delete</button>
+            </div>
+          </div>
+        `;
+      };
+
+      const buildCarousel = (typeItems, id) => {
+        if (typeItems.length === 0) return '';
+        return `
+          <div class="carousel" id="carousel-${id}">
+            ${typeItems.map(item => `
+              <div class="carousel-item">
+                ${buildItemHTML(item)}
+              </div>
+            `).join('')}
+          </div>
+        `;
+      };
+
+      // Inside a folder: separate carousels per type
+      if (currentFolder) {
+        const images = displayItems.filter(i => i.type === 'image');
+        const notes  = displayItems.filter(i => i.type === 'note');
+        const links  = displayItems.filter(i => i.type === 'link');
+
+        let html = '';
+
+        if (images.length > 0) {
+          html += `
+            <div class="type-section">
+              <div class="type-section-label">Photos</div>
+              ${buildCarousel(images, 'images')}
+            </div>
+          `;
+        }
+        if (notes.length > 0) {
+          html += `
+            <div class="type-section">
+              <div class="type-section-label">Notes</div>
+              ${buildCarousel(notes, 'notes')}
+            </div>
+          `;
+        }
+        if (links.length > 0) {
+          html += `
+            <div class="type-section">
+              <div class="type-section-label">Links</div>
+              ${buildCarousel(links, 'links')}
+            </div>
+          `;
+        }
+
+        container.innerHTML = html;
+
+        // Init drag for each carousel
+        ['images', 'notes', 'links'].forEach(id => initCarouselDrag(`carousel-${id}`));
+
+      } else {
+        // Root: vertical grid with folders
+        const folders = displayItems.filter(i => i.type === 'folder');
+        const nonFolders = displayItems.filter(i => i.type !== 'folder');
+
+        const renderCard = (item) => {
+          let mediaHTML = '';
+          if (item.type === 'folder') {
+            mediaHTML = `<div class="folder-icon">${item.title}</div>`;
+          } else if (item.type === 'image' && item.media) {
+            mediaHTML = `<img src="${item.media}" alt="${item.title}" class="item-media" onclick="openDetail('${item.id}')">`;
+          }
+
+          let linkHTML = '';
+          if (item.type === 'link' && item.link) {
+            linkHTML = `
+              <div class="item-link">
+                <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.link}</a>
+              </div>
+            `;
+          }
+
+          const itemClass = (item.type === 'note' || item.type === 'folder') ? 'item clickable' : 'item';
+          const clickHandler = item.type === 'note' ? `onclick="openDetail('${item.id}')"` : item.type === 'folder' ? `onclick="openFolder('${item.id}')"` : '';
+          const showTitle = item.type !== 'image' && item.type !== 'folder';
+          const showActions = item.type !== 'folder';
+
+          return `
+            <div class="${itemClass}" ${clickHandler}>
+              ${mediaHTML}
+              ${showTitle ? `
+              <div class="item-content">
+                <div class="item-title">${item.title}</div>
+                ${item.notes ? `<div class="item-description">${item.notes}</div>` : ''}
+              </div>` : ''}
+              ${linkHTML}
+              ${showActions ? `
+              <div class="item-meta">
+                <button class="btn-edit" onclick="event.stopPropagation(); editDetailById('${item.id}')">Edit</button>
+                <button class="btn-delete" onclick="event.stopPropagation(); deleteItem('${item.id}')">Delete</button>
+              </div>` : `
+              <div class="item-meta">
+                <button class="btn-delete" onclick="event.stopPropagation(); deleteItem('${item.id}')">Delete</button>
+              </div>`}
+            </div>
+          `;
+        };
+
+        let html = '';
+        if (folders.length > 0) {
+          html += `<div class="collections-heading">Collections</div>`;
+          html += folders.map(renderCard).join('');
+          if (nonFolders.length > 0) html += `<div style="height: 8px;"></div>`;
+        }
+        html += nonFolders.map(renderCard).join('');
+        container.innerHTML = html;
+      }
+    }
+
+    function initCarouselDrag(carouselId) {
+      const carousel = document.getElementById(carouselId || 'carousel');
+      if (!carousel) return;
+
+      let isDown = false;
+      let startX;
+      let scrollLeft;
+
+      function updateActiveCard() {
+        const carouselItems = carousel.querySelectorAll('.carousel-item');
+        const carouselCenter = carousel.scrollLeft + carousel.offsetWidth / 2;
+
+        let closestItem = null;
+        let closestDistance = Infinity;
+
+        carouselItems.forEach(item => {
+          const itemCenter = item.offsetLeft + item.offsetWidth / 2;
+          const distance = Math.abs(carouselCenter - itemCenter);
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            closestItem = item;
+          }
+        });
+
+        carouselItems.forEach(item => item.classList.remove('active'));
+        if (closestItem) closestItem.classList.add('active');
+      }
+
+      carousel.addEventListener('scroll', updateActiveCard, { passive: true });
+
+      carousel.addEventListener('mousedown', (e) => {
+        isDown = true;
+        startX = e.pageX - carousel.offsetLeft;
+        scrollLeft = carousel.scrollLeft;
+      });
+
+      carousel.addEventListener('mouseleave', () => { isDown = false; });
+      carousel.addEventListener('mouseup', () => { isDown = false; });
+      carousel.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - carousel.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        carousel.scrollLeft = scrollLeft - walk;
+      });
+
+      // Set initial active card
+      updateActiveCard();
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('modal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeModal();
+      }
+    });
+
+    // Close detail modal when clicking outside
+    document.getElementById('detailModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeDetail();
+      }
+    });
+
+    // Close profile modal when clicking outside
+    document.getElementById('profileModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeProfileModal();
+      }
+    });
+
+    function openDetailById(id) {
+      const item = items.find(i => i.id === id);
+      if (item) openDetail(id);
+    }
+
+    function editDetailById(id) {
+      const item = items.find(i => i.id === id);
+      if (item) {
+        currentDetailItem = item;
+        editDetail();
+      }
+    }
+
+    function openDetail(id) {
+      const item = items.find(i => i.id === id);
+      if (!item) return;
+
+      currentDetailItem = item;
+      isEditMode = false;
+
+      const detailModal = document.getElementById('detailModal');
+      const detailTitle = document.getElementById('detailTitle');
+      const detailBody = document.getElementById('detailBody');
+
+      // Hide title in header for images
+      detailTitle.textContent = item.type === 'image' ? '' : item.title;
+      detailTitle.style.display = item.type === 'image' ? 'none' : 'block';
+
+      let content = '';
+
+      // Show media
+      if (item.type === 'image' && item.media) {
+        content += `<img src="${item.media}" alt="${item.title}" class="detail-media">`;
+        // Show title below image
+        if (item.title) {
+          content += `<div style="text-align: center; font-size: 16px; font-weight: 500; font-family: 'Literata', serif; margin-top: 16px; margin-bottom: 24px;">${item.title}</div>`;
+        }
+      }
+
+      // Show link
+      if (item.type === 'link' && item.link) {
+        content += `
+          <div class="form-group">
+            <label>URL</label>
+            <div class="detail-link-display" style="padding: 12px; background: var(--hover); border-radius: 2px; word-break: break-all; text-align: left !important; direction: ltr !important;">
+              <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.link}</a>
+            </div>
+          </div>
+        `;
+      }
+
+      // Show notes
+      if (item.notes) {
+        content += `
+          <div class="form-group">
+            <label>Notes</label>
+            <div class="detail-notes-display" style="padding: 12px; background: var(--hover); border-radius: 2px; white-space: pre-wrap; line-height: 1.6; text-align: left !important; text-align: -webkit-left !important; text-align: -moz-left !important; direction: ltr !important; text-indent: 0 !important; display: block !important; margin: 0 !important;">
+              ${item.notes}
+            </div>
+          </div>
+        `;
+      }
+
+      detailBody.innerHTML = content;
+      
+      // Force left alignment on notes display (JavaScript override)
+      setTimeout(() => {
+        const notesDisplay = document.querySelector('.detail-notes-display');
+        if (notesDisplay) {
+          notesDisplay.style.textAlign = 'left';
+          notesDisplay.style.direction = 'ltr';
+          notesDisplay.style.textIndent = '0';
+          notesDisplay.style.margin = '0';
+          notesDisplay.style.paddingLeft = '12px';
+        }
+      }, 0);
+      
+      detailModal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeDetail() {
+      document.getElementById('detailModal').classList.remove('active');
+      document.body.style.overflow = '';
+      currentDetailItem = null;
+      isEditMode = false;
+    }
+
+    function editDetail() {
+      if (!currentDetailItem) return;
+
+      const item = currentDetailItem;
+      
+      // Close detail view if it's open
+      const detailModal = document.getElementById('detailModal');
+      if (detailModal.classList.contains('active')) {
+        closeDetail();
+      }
+
+      // Open edit modal with pre-filled data
+      openModal();
+
+      // Change modal title to Edit
+      document.getElementById('modalTitle').textContent = 'Edit Item';
+      
+      // Hide the type selector
+      document.getElementById('typeSelector').style.display = 'none';
+      
+      // Set the type
+      currentType = item.type;
+      document.querySelectorAll('.type-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.type === item.type) {
+          btn.classList.add('active');
+        }
+      });
+
+      // Show/hide appropriate fields
+      const fileGroup = document.getElementById('fileGroup');
+      const linkGroup = document.getElementById('linkGroup');
+      const notesGroup = document.getElementById('notesGroup');
+      const titleLabel = document.getElementById('titleLabel');
+      
+      // Hide file upload for notes, links, and folders
+      if (item.type === 'link' || item.type === 'note' || item.type === 'folder') {
+        fileGroup.style.display = 'none';
+        linkGroup.style.display = item.type === 'link' ? 'block' : 'none';
+      } else {
+        // Only show file upload for images
+        fileGroup.style.display = 'block';
+        linkGroup.style.display = 'none';
+      }
+      
+      // Hide notes for collections, update title label
+      notesGroup.style.display = item.type === 'folder' ? 'none' : 'block';
+      titleLabel.textContent = item.type === 'folder' ? 'Name' : 'Title (optional)';
+
+      // Fill in the form
+      document.getElementById('titleInput').value = item.title;
+      document.getElementById('notesInput').value = item.notes || '';
+      if (item.link) {
+        document.getElementById('linkInput').value = item.link;
+      }
+
+      // Show preview for media
+      const preview = document.getElementById('preview');
+      if (item.type === 'image' && item.media) {
+        preview.innerHTML = `<img src="${item.media}" alt="Preview">`;
+      }
+
+      // Store that we're editing
+      isEditMode = true;
+      
+      // Change the save button action temporarily
+      const modalFooter = document.querySelector('.modal-footer');
+      modalFooter.innerHTML = `
+        <button onclick="closeModal()">Cancel</button>
+        <button class="primary" onclick="updateItem('${item.id}')">Update</button>
+      `;
+    }
+
+    function updateItem(id) {
+      const itemIndex = items.findIndex(i => i.id === id);
+      if (itemIndex === -1) return;
+
+      const title = document.getElementById('titleInput').value;
+      const notes = document.getElementById('notesInput').value;
+      const link = document.getElementById('linkInput').value;
+
+      // Keep existing media if no new file selected
+      let mediaData = items[itemIndex].media;
+      
+      function finishUpdate() {
+        items[itemIndex] = {
+          ...items[itemIndex],
+          title: title,
+          notes: notes,
+          link: link,
+          media: mediaData,
+          parentFolder: items[itemIndex].parentFolder
+        };
+
+        try {
+          saveToStorage();
+          renderItems();
+          closeModal();
+          
+          // Reset modal footer
+          const modalFooter = document.querySelector('.modal-footer');
+          modalFooter.innerHTML = `
+            <button onclick="closeModal()">Cancel</button>
+            <button class="primary" onclick="saveItem()">Save</button>
+          `;
+          isEditMode = false;
+        } catch (error) {
+          alert('Failed to update item: ' + error.message);
+          console.error(error);
+        }
+      }
+
+      if (currentFile) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          mediaData = e.target.result;
+          finishUpdate();
+        };
+        reader.onerror = function(e) {
+          alert('Failed to read file');
+          finishUpdate();
+        };
+        reader.readAsDataURL(currentFile);
+      } else {
+        finishUpdate();
+      }
+    }
+
+    function deleteFromDetail() {
+      if (!currentDetailItem) return;
+      
+      if (confirm('Delete this item?')) {
+        deleteItem(currentDetailItem.id);
+        closeDetail();
+      }
+    }
+
+    function openProfileModal() {
+      document.getElementById('profileModal').classList.add('active');
+      document.body.style.overflow = 'hidden';
+      
+      // Load existing profile if any
+      const profile = localStorage.getItem('userProfile');
+      if (profile) {
+        const profileData = JSON.parse(profile);
+        document.getElementById('profileEmail').value = profileData.email || '';
+      }
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profileModal').classList.remove('active');
+      document.body.style.overflow = '';
+      document.getElementById('profileForm').reset();
+    }
+
+    function saveProfile() {
+      const email = document.getElementById('profileEmail').value;
+      const password = document.getElementById('profilePassword').value;
+      const passwordConfirm = document.getElementById('profilePasswordConfirm').value;
+
+      if (!email || !password) {
+        alert('Please fill in all fields.');
+        return;
+      }
+
+      if (password !== passwordConfirm) {
+        alert('Passwords do not match.');
+        return;
+      }
+
+      if (password.length < 6) {
+        alert('Password must be at least 6 characters long.');
+        return;
+      }
+
+      // Save profile to localStorage
+      const profile = {
+        email: email,
+        password: password, // In production, this should be hashed
+        createdAt: Date.now()
+      };
+
+      localStorage.setItem('userProfile', JSON.stringify(profile));
+      alert('Profile saved successfully!');
+      closeProfileModal();
+    }
+
+    function openFolder(id) {
+      const folder = items.find(i => i.id === id);
+      if (!folder || folder.type !== 'folder') return;
+      
+      currentFolder = id;
+      folderPath.push({ id: id, title: folder.title });
+      renderItems();
+    }
+
+    function navigateToFolder(index) {
+      if (index === -1) {
+        // Navigate to root
+        currentFolder = null;
+        folderPath = [];
+      } else {
+        // Navigate to specific folder in path
+        currentFolder = folderPath[index].id;
+        folderPath = folderPath.slice(0, index + 1);
+      }
+      renderItems();
+    }
+
+    function updateBreadcrumb() {
+      const breadcrumb = document.getElementById('breadcrumb');
+      
+      if (folderPath.length === 0) {
+        breadcrumb.innerHTML = '';
+        return;
+      }
+
+      let html = '<span class="breadcrumb-item" onclick="navigateToFolder(-1)">Home</span>';
+      
+      folderPath.forEach((folder, index) => {
+        html += '<span class="breadcrumb-separator">/</span>';
+        html += `<span class="breadcrumb-item" onclick="navigateToFolder(${index})">${folder.title}</span>`;
+      });
+      
+      breadcrumb.innerHTML = html;
+    }
+
+    // Load items on startup
+    loadItems();
+
+    // Force textarea left alignment (nuclear option)
+    function forceTextareaAlignment() {
+      const textarea = document.getElementById('notesInput');
+      if (textarea) {
+        textarea.style.textAlign = 'left';
+        textarea.style.direction = 'ltr';
+        textarea.style.textIndent = '0';
+        textarea.style.paddingLeft = '12px';
+        textarea.style.marginLeft = '0';
+      }
+    }
+
+    // Run on page load
+    setTimeout(forceTextareaAlignment, 100);
+
+    // Run on any interaction with textarea
+    setTimeout(() => {
+      const textarea = document.getElementById('notesInput');
+      if (textarea) {
+        textarea.addEventListener('focus', forceTextareaAlignment);
+        textarea.addEventListener('click', forceTextareaAlignment);
+        textarea.addEventListener('input', forceTextareaAlignment);
+      }
+    }, 200);
+  </script>
+</body>
+</html>
